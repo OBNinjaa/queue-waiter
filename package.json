@@ -1,0 +1,27 @@
+{
+  "name": "queue-waiter",
+  "version": "1.0.0",
+  "description": "A minecraft proxy which can be be used to wait out 2b2t's queue without having to have your game open",
+  "main": "src/proxy.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OBNinjaa/queue-waiter.git"
+  },
+  "keywords": [
+    "2b2t",
+    "prismarine-proxy",
+    "2b2t"
+  ],
+  "author": "OBNinjaa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OBNinjaa/queue-waiter/issues"
+  },
+  "homepage": "https://github.com/OBNinjaa/queue-waiter#readme",
+  "dependencies": {
+    "buffer-equal": "^1.0.1",
+    "colors": "^1.4.0",
+    "figlet": "^1.5.2",
+    "minecraft-protocol": "^1.36.1"
+  }
+}
