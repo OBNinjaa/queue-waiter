@@ -5,19 +5,9 @@ const {
 } = require("minecraft-protocol");
 const bufferEqual = require("buffer-equal");
 const colors = require("colors");
-const figlet = require("figlet");
 
-console.clear();
-console.log(
-  figlet.textSync("2B2T Waiter", {
-    font: "colossal",
-    horizontalLayout: "default",
-    verticalLayout: "default",
-  }).yellow
-);
-
-console.log(colors.yellow(`dsc.gg/mineflayer`));
-console.log(colors.yellow(`github.com/OBNinjaa`));
+console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`Created by OBNinjaa`));
+console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`https://dsc.gg/wolkig`));
 
 const config = require("./config.json");
 const { username, password, auth, version, host, local } = config;
@@ -37,8 +27,37 @@ const proxyClient = createClient({
 
 proxyClient.on("packet", (data, meta) => {
   if (meta.name === "keep_alive") return;
-  if (!["update_time", "success", "custom_payload", "playerlist_header", "player_info", "encryption_begin", "compress"].includes(meta.name))
+  if (
+    ![
+      "keep_alive",
+      "animation",
+      "entity_action",
+      "entity_teleport",
+      "entity_velocity",
+      "entity_head_look",
+      "entity_effect",
+      "entity_equipment",
+      "entity_properties",
+      "vehicle_move",
+      "vehicle_look",
+      "player_abilities",
+      "tab_complete",
+      "chat",
+      "spectate",
+      "update_time",
+      "success",
+      "custom_payload",
+      "encryption_begin",
+      "compress",
+      "remove_entity_effect",
+      "rel_entity_move",
+      "entity_move_look",
+      "flying",
+      "open_window",
+    ].includes(meta.name)
+  )
     packets.push([meta, data]);
+
   if (!userClient || meta.state !== PLAY || userClient.state !== PLAY) return;
   userClient.write(meta.name, data);
   if (meta.name === "set_compression") userClient.compressionThreshold = data.threshold;
@@ -46,32 +65,19 @@ proxyClient.on("packet", (data, meta) => {
 
 proxyClient.on("raw", (buffer, meta) => {
   if (!userClient || meta.name === "keep_alive" || meta.state !== PLAY || userClient.state !== PLAY) return;
-  const packetData = proxyClient.deserializer.parsePacketBuffer(buffer).data.params;
-  const packetBuff = userClient.serializer.createPacketBuffer({ name: meta.name, params: packetData });
-  if (!bufferEqual(buffer, packetBuff)) {
-    console.log(`[${new Date().toLocaleTimeString().grey}]`, "client<-server: Error in packet " + meta.state + "." + meta.name);
-    console.log(`[${new Date().toLocaleTimeString().grey}]`, "received buffer", buffer.toString("hex"));
-    console.log(`[${new Date().toLocaleTimeString().grey}]`, "produced buffer", packetBuff.toString("hex"));
-    console.log(`[${new Date().toLocaleTimeString().grey}]`, "received length", buffer.length);
-    console.log(`[${new Date().toLocaleTimeString().grey}]`, "produced length", packetBuff.length);
-  }
 });
 
 proxyClient.on("end", () => {
   if (!userClient) return;
   userClient.end("End");
-  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.red(`Disconnected From The Server`), "[ENDED]");
+  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`Disconnected From The Server`), "[ENDED]".grey);
 });
 
 proxyClient.on("error", (error) => {
   if (!userClient) return;
   userClient.end(error);
-  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.red(`Client Was Disconnected`), "[ERROR]");
-  console.error(`[${new Date().toLocaleTimeString().cyan}]`, colors.red(error.message));
-});
-
-proxyClient.on("animation", (packet) => {
-  console.log(packet);
+  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`Client Was Disconnected`), "[ERROR]".red);
+  console.error(`[${new Date().toLocaleTimeString().magenta}]`, colors.red(error.message));
 });
 
 proxyClient.on("chat", (packet) => {
@@ -82,7 +88,7 @@ proxyClient.on("chat", (packet) => {
         .join("")
         .slice(0, 22)
     : message.text;
-  console.log(`[${new Date().toLocaleTimeString().cyan}]`, colors.yellow(messageText));
+  console.log(`[${new Date().toLocaleTimeString().magenta}]`, colors.white(messageText));
 });
 
 const proxyServer = createServer({
@@ -90,13 +96,13 @@ const proxyServer = createServer({
   "max-players": 1,
   host: local,
   port: 25566,
-  motd: "github.com/OBNinjaa",
+  motd: "By OBNinjaa\ndsc.gg/wolkig",
   keepAlive: false,
   version: version,
 });
 
 proxyServer.on("login", (client) => {
-  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.red(`Client Connected To The Server`));
+  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.green(`${client.username} connected to the server`));
   packets.forEach((p) => {
     const meta = p[0];
     const data = p[1];
@@ -114,28 +120,16 @@ proxyServer.on("login", (client) => {
   client.on("raw", (buffer, meta) => {
     if (meta.name === "keep_alive") return;
     if (!proxyClient || meta.state !== PLAY || proxyClient.state !== PLAY) return;
-    const packetData = client.deserializer.parsePacketBuffer(buffer).data.params;
-    const packetBuff = proxyClient.serializer.createPacketBuffer({ name: meta.name, params: packetData });
-    if (!bufferEqual(buffer, packetBuff)) {
-      console.log(`[${new Date().toLocaleTimeString().cyan}]`, "client<-server: Error in packet " + meta.state + "." + meta.name);
-      console.log(`[${new Date().toLocaleTimeString().cyan}]`, "received buffer", buffer.toString("hex"));
-      console.log(`[${new Date().toLocaleTimeString().cyan}]`, "produced buffer", packetBuff.toString("hex"));
-      console.log(`[${new Date().toLocaleTimeString().cyan}]`, "received length", buffer.length);
-      console.log(`[${new Date().toLocaleTimeString().cyan}]`, "produced length", packetBuff.length);
-    }
   });
 
-  client.on("end", () => {
+  client.on("end", (client) => {
     if (!proxyClient) return;
-    //   proxyClient.end("End");
-    console.log(`[${new Date().toLocaleTimeString().cyan}]`, colors.red(`Client Disconnected From The Server`), "[ENDED]");
+    console.log(`[${new Date().toLocaleTimeString().magenta}]`, colors.yellow(`Client disconnected from the server`), "[ENDED]".grey);
   });
 
   client.on("error", (error) => {
     if (!proxyClient) return;
-    //   proxyClient.end(error);
-    console.log(`[${new Date().toLocaleTimeString().red}]`, colors.red(`Client Disconnected From The Server`), `[ERROR]`);
-    client.end(`\u00A76\u00A7lYou Was Kicked\u00A7r\n\u00A7c\u00A7l${error}`);
-    console.log(error);
+    console.log(`[${new Date().toLocaleTimeString().red}]`, colors.yellow(`Client disconnected from the server`), `[ERROR]`.red);
+    console.log(error.message);
   });
 });
