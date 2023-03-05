@@ -21,7 +21,6 @@
   "dependencies": {
     "buffer-equal": "^1.0.1",
     "colors": "^1.4.0",
-    "figlet": "^1.5.2",
     "minecraft-protocol": "^1.36.1"
   }
 }
