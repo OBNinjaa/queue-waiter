@@ -3,7 +3,7 @@
 
 A minecraft proxy which can be be used to wait out 2b2t's queue without having to have your game open
 
-![Logo](https://imgur.com/85YQ42q)
+![Logo](https://imgur.com/85YQ42q.png)
 
 ## Installation
 
