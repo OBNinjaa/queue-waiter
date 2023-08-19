@@ -1,108 +1,71 @@
-const {
-  createClient,
-  createServer,
-  states: { PLAY },
-} = require("minecraft-protocol");
-const bufferEqual = require("buffer-equal");
-const colors = require("colors");
-
-console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`Created by OBNinjaa`));
-console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`https://dsc.gg/wolkig`));
-
-const config = require("./config.json");
-const { username, password, auth, version, host, local } = config;
+const { createClient, createServer, states } = require("minecraft-protocol");
 
 let userClient;
 const packets = [];
+let previousQueueNumber = null;
+
+const { username } = require("./username.json");
 
 const proxyClient = createClient({
   username: username,
-  password: password || null,
-  auth: auth,
-  host: host,
+  auth: "microsoft",
+  host: "2B2T.ORG",
   port: 25565,
   keepAlive: true,
-  version: version,
+  version: "1.19.4",
+  hideErrors: true,
 });
 
 proxyClient.on("packet", (data, meta) => {
   if (meta.name === "keep_alive") return;
-  if (
-    ![
-      "keep_alive",
-      "animation",
-      "entity_action",
-      "entity_teleport",
-      "entity_velocity",
-      "entity_head_look",
-      "entity_effect",
-      "entity_equipment",
-      "entity_properties",
-      "vehicle_move",
-      "vehicle_look",
-      "player_abilities",
-      "tab_complete",
-      "chat",
-      "spectate",
-      "update_time",
-      "success",
-      "custom_payload",
-      "encryption_begin",
-      "compress",
-      "remove_entity_effect",
-      "rel_entity_move",
-      "entity_move_look",
-      "flying",
-      "open_window",
-    ].includes(meta.name)
-  )
-    packets.push([meta, data]);
+  if (!["keep_alive", "success", "custom_payload", "encryption_begin", "compress", "look", "flying", "open_window", "close_window", "close_window", "player_chat", "profileless_chat"].includes(meta.name)) packets.push([meta, data]);
 
-  if (!userClient || meta.state !== PLAY || userClient.state !== PLAY) return;
+  if (meta.name === "set_title_subtitle") {
+    try {
+      const parsedData = JSON.parse(data.text);
+      const queueText = parsedData.text;
+      const queueNumber = parseInt(queueText.match(/\d+/)[0]);
+
+      if (previousQueueNumber !== queueNumber) {
+        console.log("Position in queue", queueNumber);
+        previousQueueNumber = queueNumber;
+      }
+    } catch (err) {
+      return;
+    }
+  }
+
+  if (!userClient || meta.state !== states.PLAY || userClient.state !== states.PLAY) return;
   userClient.write(meta.name, data);
   if (meta.name === "set_compression") userClient.compressionThreshold = data.threshold;
 });
 
 proxyClient.on("raw", (buffer, meta) => {
-  if (!userClient || meta.name === "keep_alive" || meta.state !== PLAY || userClient.state !== PLAY) return;
+  if (!userClient || meta.name === "keep_alive" || meta.state !== states.PLAY || userClient.state !== states.PLAY) return;
 });
 
 proxyClient.on("end", () => {
   if (!userClient) return;
-  userClient.end("End");
-  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`Disconnected From The Server`), "[ENDED]".grey);
+  userClient.end("Proxy client ended");
 });
 
 proxyClient.on("error", (error) => {
   if (!userClient) return;
+  console.error("Proxy client error:", error);
   userClient.end(error);
-  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.yellow(`Client Was Disconnected`), "[ERROR]".red);
-  console.error(`[${new Date().toLocaleTimeString().magenta}]`, colors.red(error.message));
-});
-
-proxyClient.on("chat", (packet) => {
-  const message = JSON.parse(packet.message);
-  const messageText = message.extra
-    ? message.extra
-        .map((i) => i.text)
-        .join("")
-        .slice(0, 22)
-    : message.text;
-  console.log(`[${new Date().toLocaleTimeString().magenta}]`, colors.white(messageText));
 });
 
 const proxyServer = createServer({
   "online-mode": true,
-  "max-players": 1,
-  host: local,
+  host: "0.0.0.0",
   port: 25566,
-  motd: "By OBNinjaa\ndsc.gg/wolkig",
   keepAlive: false,
-  version: version,
+  version: "1.19.4",
 });
 
 proxyServer.on("login", (client) => {
-  console.log(`[${new Date().toLocaleTimeString().grey}]`, colors.green(`${client.username} connected to the server`));
+  console.log(`${client.username} has connected`);
+
   packets.forEach((p) => {
     const meta = p[0];
     const data = p[1];
@@ -113,23 +76,22 @@ proxyServer.on("login", (client) => {
 
   client.on("packet", (data, meta) => {
     if (meta.name === "keep_alive") return;
-    if (!proxyClient || meta.state !== PLAY || proxyClient.state !== PLAY) return;
+    if (!proxyClient || meta.state !== states.PLAY || proxyClient.state !== states.PLAY) return;
     proxyClient.write(meta.name, data);
   });
 
   client.on("raw", (buffer, meta) => {
     if (meta.name === "keep_alive") return;
-    if (!proxyClient || meta.state !== PLAY || proxyClient.state !== PLAY) return;
+    if (!proxyClient || meta.state !== states.PLAY || proxyClient.state !== states.PLAY) return;
   });
 
-  client.on("end", (client) => {
+  client.on("end", () => {
     if (!proxyClient) return;
-    console.log(`[${new Date().toLocaleTimeString().magenta}]`, colors.yellow(`Client disconnected from the server`), "[ENDED]".grey);
+    console.log(`${client.username} has disconnected`);
   });
 
   client.on("error", (error) => {
     if (!proxyClient) return;
-    console.log(`[${new Date().toLocaleTimeString().red}]`, colors.yellow(`Client disconnected from the server`), `[ERROR]`.red);
-    console.log(error.message);
+    console.error(error);
   });
 });

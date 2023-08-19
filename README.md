@@ -1,9 +1,7 @@
-
 # Queue Waiter
 
-A minecraft proxy which can be be used to wait out 2b2t's queue without having to have your game open
-
-![Logo](https://imgur.com/85YQ42q.png)
+- Wait out server queues while you are away (You need to join one time only to initialize the client)
+- There is no need to enter email and password as it uses MSA authentication and the server automatically gets your username on connection to the proxy
 
 ## Installation
 
@@ -11,19 +9,7 @@ A minecraft proxy which can be be used to wait out 2b2t's queue without having t
   npm Install
   node .
 ```
-## Example Config
-
-```json
-{
-  "username": "email@gmail.com",
-  "password": "Password123",
-  "auth": "microsoft",
-  "host": "2b2t.org",
-  "version": "1.12.2",
-  "local": "localhost"
-}
-
-```
 
 ## 🔗 Links
+
 [![](https://dcbadge.vercel.app/api/server/NysD9gyx7R)](https://discord.gg/NysD9gyx7R)

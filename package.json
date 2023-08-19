@@ -8,9 +8,9 @@
     "url": "git+https://github.com/OBNinjaa/queue-waiter.git"
   },
   "keywords": [
-    "2b2t",
-    "prismarine-proxy",
-    "2b2t"
+    "minecraft",
+    "proxy",
+    "mineflayer"
   ],
   "author": "OBNinjaa",
   "license": "ISC",
@@ -19,8 +19,6 @@
   },
   "homepage": "https://github.com/OBNinjaa/queue-waiter#readme",
   "dependencies": {
-    "buffer-equal": "^1.0.1",
-    "colors": "^1.4.0",
     "minecraft-protocol": "^1.36.1"
   }
 }
