@@ -10,6 +10,11 @@
   node .
 ```
 
+# Authentication
+
+- The tool uses Microsoft Authentication (MSA) for a secure login process. This means you won't have to provide your email and password.
+- You may be asked to visit [microsoft.com](https://microsoft.com/link) and enter the **authentication** code provided in the console in order to authenticate.
+
 ## 🔗 Links
 
 [![](https://dcbadge.vercel.app/api/server/NysD9gyx7R)](https://discord.gg/NysD9gyx7R)
