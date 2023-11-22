@@ -9,6 +9,11 @@
   npm Install
   node .
 ```
+## Docker
+```bash
+  docker build -t queue-waiter .
+  docker run -it -p 25566:25566 --name my-queue-waiter queue-waiter
+```
 
 # Authentication
 

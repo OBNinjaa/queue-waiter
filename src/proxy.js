@@ -27,7 +27,8 @@ proxyClient.on("packet", (data, meta) => {
       const queueNumber = parseInt(queueText.match(/\d+/)[0]);
 
       if (previousQueueNumber !== queueNumber) {
-        console.log("Position in queue", queueNumber);
+        const currentTime = new Date().toLocaleTimeString(); // Get the current time
+        console.log(`[${currentTime}] Position in queue: ${queueNumber}`); // Display time with queue position
         previousQueueNumber = queueNumber;
       }
     } catch (err) {
