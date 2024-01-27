@@ -7,9 +7,11 @@
 
 ```bash
   npm Install
-  node .
+  npm start
 ```
+
 ## Docker
+
 ```bash
   docker build -t queue-waiter .
   docker run -it -p 25566:25566 --name my-queue-waiter queue-waiter
