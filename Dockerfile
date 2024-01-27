@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 25566
 
 # Start the application with `node .`
-CMD [ "node", "." ]
+CMD [ "npm", "start" ]
