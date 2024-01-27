@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+https://github.com/OBNinjaa/queue-waiter.git"
   },
+  "scripts": {
+    "start": "node src/proxy.js"
+  },
   "keywords": [
     "minecraft",
     "proxy",
@@ -19,6 +22,6 @@
   },
   "homepage": "https://github.com/OBNinjaa/queue-waiter#readme",
   "dependencies": {
-    "minecraft-protocol": "^1.36.1"
+    "minecraft-protocol": "^1.45.0"
   }
 }
