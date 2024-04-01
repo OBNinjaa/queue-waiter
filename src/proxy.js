@@ -2,7 +2,7 @@ const { createServer, createClient, states } = require("minecraft-protocol");
 const axios = require("axios");
 const { username, host, version, port, webhook } = require("./settings.json");
 
-const server = createServer({ "online-mode": false, port, host: "0.0.0.0", version, keepAlive: false, hideErrors: true });
+const server = createServer({ "online-mode": true, port, host: "0.0.0.0", version, keepAlive: false, hideErrors: true });
 const remote = createClient({ host, port: 25565, version, username, auth: "microsoft", hideErrors: true });
 
 const packets = new Map();
@@ -202,6 +202,7 @@ function handleClientPacket(data, meta) {
     switch (command) {
       case "packets":
         packetCount();
+
         break;
     }
   }
@@ -273,7 +274,6 @@ function send(message) {
 }
 
 function packetCount() {
-  console.log("Stored packets:");
   const packetCounts = new Map();
 
   packets.forEach((data, meta) => {
@@ -285,7 +285,10 @@ function packetCount() {
     }
   });
 
-  packetCounts.forEach((count, packetName) => {
-    console.log(`${packetName}: ${count}`);
-  });
+  const packetsArray = Array.from(packetCounts.entries())
+    .map(([name, count]) => `${name}: ${count}`)
+    .join("\n");
+
+  const messageBlock = `\`\`\`\n${packetsArray}\n\`\`\``;
+  send(messageBlock);
 }
