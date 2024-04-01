@@ -124,34 +124,36 @@ function handleRemotePacket(data, meta) {
   if (meta.name === "playerlist_header" && host.toLowerCase() === "2b2t.org") {
     const headerData = JSON.parse(data.header);
 
-    const estimatedTimeItem = headerData.extra.find((item) => item.text && item.text.startsWith("Estimated time: "));
+    if (headerData.extra) {
+      const estimatedTimeItem = headerData.extra.find((item) => item.text && item.text.startsWith("Estimated time: "));
 
-    if (estimatedTimeItem && estimatedTimeItem.extra && estimatedTimeItem.extra[0] && estimatedTimeItem.extra[0].text) {
-      const estimatedTime = estimatedTimeItem.extra[0].text.trim();
-      const timeComponents = estimatedTime.match(/(\d+h)?(\d+m)?(\d+s)?/);
+      if (estimatedTimeItem && estimatedTimeItem.extra && estimatedTimeItem.extra[0] && estimatedTimeItem.extra[0].text) {
+        const estimatedTime = estimatedTimeItem.extra[0].text.trim();
+        const timeComponents = estimatedTime.match(/(\d+h)?(\d+m)?(\d+s)?/);
 
-      if (timeComponents) {
-        let hours = 0;
-        let minutes = 0;
-        let seconds = 0;
+        if (timeComponents) {
+          let hours = 0;
+          let minutes = 0;
+          let seconds = 0;
 
-        if (timeComponents[1]) {
-          hours = parseInt(timeComponents[1]);
+          if (timeComponents[1]) {
+            hours = parseInt(timeComponents[1]);
+          }
+          if (timeComponents[2]) {
+            minutes = parseInt(timeComponents[2]);
+          }
+          if (timeComponents[3]) {
+            seconds = parseInt(timeComponents[3]);
+          }
+
+          estimation = `${hours}h ${minutes}m ${seconds}s`;
+          server.motd = server.motd + `\nEstimated time: ${hours}h ${minutes}m ${seconds}s`;
+        } else {
+          console.log("Invalid estimated time format.");
         }
-        if (timeComponents[2]) {
-          minutes = parseInt(timeComponents[2]);
-        }
-        if (timeComponents[3]) {
-          seconds = parseInt(timeComponents[3]);
-        }
-
-        estimation = `${hours}h ${minutes}m ${seconds}s`;
-        server.motd = server.motd + `\nEstimated time: ${hours}h ${minutes}m ${seconds}s`;
       } else {
-        console.log("Invalid estimated time format.");
+        console.log("Estimated time not found.");
       }
-    } else {
-      console.log("Estimated time not found.");
     }
   }
 
