@@ -1,1 +1,7 @@
-{ "username": "OBNinjaa", "version": "1.19.4", "port": 25566 }
+{
+  "username": "OBNinjaa",
+  "host": "2b2t.org",
+  "version": "1.19.4",
+  "port": 25566,
+  "webhook": "https://discord.com/api/webhooks/XXXXXXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}
